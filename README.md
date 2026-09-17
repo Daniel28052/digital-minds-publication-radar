@@ -1,24 +1,42 @@
 # Digital Minds Publication Radar
 
-A lightweight web app for tracking researchers and reviewing their latest scholarly publications.
+This GitHub Pages site checks confirmed Digital Minds researchers for new DOI publications and asks for approval before adding them to the shared publication inbox.
 
-## What it does
+## How the approval workflow works
 
-- Adds researchers by name and optional affiliation.
-- Matches each researcher to an OpenAlex author record.
-- Retrieves publications from the past five years.
-- Filters results by title, author, journal, and year.
-- Saves selected papers to a local review list.
-- Stores optional Google Scholar profile links for later verification.
+1. The GitHub Action runs once a day and can also be started manually from the **Actions** tab.
+2. It checks each confirmed OpenAlex researcher ID for DOI-bearing articles, reviews, book chapters, and conference papers from the last five years.
+3. If it finds anything new, it opens a pull request titled **Review newly discovered Digital Minds publications**.
+4. A team member checks the researcher, DOI, details, and draft blurb.
+5. **Merge** means approve. **Close** means reject.
+6. After a merge, GitHub Pages redeploys and the approved records appear in the website's Inbox.
 
-## Data source
+No pull request is created when nothing has changed.
 
-Automated discovery uses the public OpenAlex API. Direct Google Scholar scraping is intentionally avoided because it is fragile, frequently blocked, and may conflict with Google's automated-access rules.
+## One-time GitHub setup
 
-## Run locally
+Upload every file and folder in this package to the root of the repository. Keep these exact paths:
 
-Open `index.html` in a browser. Data is stored in that browser's local storage.
+- `index.html`
+- `README.md`
+- `researchers.json`
+- `publications.json`
+- `scripts/check_publications.py`
+- `.github/workflows/check-publications.yml`
 
-## Current scope
+Then open **Settings → Actions → General → Workflow permissions**. Select **Read and write permissions**, tick **Allow GitHub Actions to create and approve pull requests**, and save.
 
-This first version is designed for one person's browser. A later version can add shared team accounts, scheduled scans, email alerts, and a central database.
+Open the **Actions** tab, choose **Check for new publications**, select **Run workflow**, and wait for the first check.
+
+## Adding confirmed researchers to the automatic check
+
+1. Add and confirm researchers on the website as usual.
+2. Open **Researchers**.
+3. Click **Export automation file**. This downloads `researchers.json`.
+4. Replace the repository's existing `researchers.json` with the downloaded file.
+
+The next scheduled or manual check will include those researchers. Only confirmed matches with an OpenAlex ID are exported.
+
+## Important limitation
+
+Approved discoveries in `publications.json` are shared with everyone. Status changes, edited blurbs, and internal notes made inside the website are still saved only in that person's browser. A database and sign-in would be needed for fully shared team editing.
